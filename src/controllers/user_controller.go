@@ -2,12 +2,20 @@ package controllers
 
 import (
 	"encoding/json"
-	"fmt"
 	"go-authentication/src/database"
 	"go-authentication/src/models"
 	"net/http"
 )
 
+// GetUserInfo godoc
+// @Summary Get user information
+// @Description Get user information based on the email
+// @Tags Users
+// @Produce json
+// @Success 200 {object} models.User
+// @Failure 401 {string} string "User not found"
+// @Failure 500 {string} string "Failed to encode user info"
+// @Router /api/get-user-info [get]
 func GetUserInfo(w http.ResponseWriter, r *http.Request) {
 	email := r.Context().Value("email").(string)
 	// fmt.Println(email)
@@ -23,11 +31,4 @@ func GetUserInfo(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode(dbUser); err != nil {
 		http.Error(w, "Failed to encode user info", http.StatusInternalServerError)
 	}
-}
-
-func GetAccountInfo(w http.ResponseWriter, r *http.Request) {
-	userEmail := r.Context().Value("user").(string)
-
-	response := fmt.Sprintf("Hello, %s! This is your API.", userEmail)
-	w.Write([]byte(response))
 }

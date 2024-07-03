@@ -17,14 +17,35 @@ info:
     email: support@swagger.io
     name: API Support
     url: http://www.swagger.io/support
-  description: This is a sample server for MyApp.
+  description: Basic Go Authentication Application.
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   termsOfService: http://swagger.io/terms/
-  title: MyApp API
+  title: go-authentication
   version: "1.0"
 paths:
+  /api/get-user-info:
+    get:
+      description: Get user information based on the email
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+        "401":
+          description: User not found
+          schema:
+            type: string
+        "500":
+          description: Failed to encode user info
+          schema:
+            type: string
+      summary: Get user information
+      tags:
+      - Users
   /login:
     post:
       consumes:

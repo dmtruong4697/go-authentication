@@ -10,9 +10,9 @@ import (
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
-// @title MyApp API
+// @title go-authentication
 // @version 1.0
-// @description This is a sample server for MyApp.
+// @description Basic Go Authentication Application.
 // @termsOfService http://swagger.io/terms/
 
 // @contact.name API Support
