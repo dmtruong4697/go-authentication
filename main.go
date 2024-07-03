@@ -2,6 +2,7 @@ package main
 
 import (
 	_ "go-authentication/docs" // Import generated docs
+	"go-authentication/src/controllers"
 	"go-authentication/src/database"
 	"go-authentication/src/routes"
 	"log"
@@ -34,6 +35,8 @@ import (
 func main() {
 	// Initialize the database connection
 	database.Connect()
+
+	go controllers.HandleMessages()
 
 	// Set up the router
 	r := routes.SetupRouter()

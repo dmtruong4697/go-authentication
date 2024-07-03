@@ -11,7 +11,7 @@ import (
 var DB *gorm.DB
 
 func Connect() {
-	dsn := "root:truong123456@tcp(localhost:3306)/?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := "root:truong123456@tcp(localhost:3306)/sys?charset=utf8mb4&parseTime=True&loc=Local"
 	var err error
 	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
@@ -30,4 +30,5 @@ func Connect() {
 	}
 
 	DB.AutoMigrate(&models.User{})
+	DB.AutoMigrate(&models.Message{})
 }

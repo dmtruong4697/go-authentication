@@ -33,5 +33,8 @@ func SetupRouter() *mux.Router {
 	api.HandleFunc("/get-user-info", controllers.GetUserInfo).Methods("GET")
 	api.HandleFunc("/update-user-info", controllers.UpdateUserInfo).Methods("PUT")
 
+	r.HandleFunc("/ws", controllers.HandleConnections).Methods("GET")
+	r.HandleFunc("/messages", controllers.GetMessages).Methods("POST")
+
 	return r
 }
