@@ -1,5 +1,19 @@
 basePath: /
 definitions:
+  controllers.LoginUser:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  controllers.UpdateUser:
+    properties:
+      name:
+        type: string
+      password:
+        type: string
+    type: object
   models.User:
     properties:
       email:
@@ -46,6 +60,36 @@ paths:
       summary: Get user information
       tags:
       - Users
+  /api/update-user-info:
+    put:
+      consumes:
+      - application/json
+      description: Update user information based on the email
+      parameters:
+      - description: User object
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.UpdateUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+        "401":
+          description: User not found
+          schema:
+            type: string
+        "500":
+          description: Failed to update user information
+          schema:
+            type: string
+      summary: Update user information
+      tags:
+      - Users
   /login:
     post:
       consumes:
@@ -57,7 +101,7 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/models.User'
+          $ref: '#/definitions/controllers.LoginUser'
       produces:
       - application/json
       responses:

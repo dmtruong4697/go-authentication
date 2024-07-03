@@ -17,6 +17,11 @@ type Claims struct {
 	jwt.StandardClaims
 }
 
+type LoginUser struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
 // Register godoc
 // @Summary Register a new user
 // @Description Register a new user with email and password
@@ -50,7 +55,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 // @Tags auth
 // @Accept  json
 // @Produce  json
-// @Param   user     body    models.User     true        "User Info"
+// @Param   user     body    LoginUser     true        "User Info"
 // @Success 200 {string} string "token"
 // @Failure 400 {string} string "Bad Request"
 // @Failure 401 {string} string "Unauthorized"
