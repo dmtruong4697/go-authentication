@@ -29,5 +29,7 @@ func SetupRouter() *mux.Router {
 		w.Write([]byte("Hello, " + email))
 	}).Methods("GET")
 
+	api.HandleFunc("/get-user-info", controllers.GetUserInfo).Methods("GET")
+
 	return r
 }
