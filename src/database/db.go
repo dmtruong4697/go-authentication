@@ -31,4 +31,5 @@ func Connect() {
 
 	DB.AutoMigrate(&models.User{})
 	DB.AutoMigrate(&models.Message{})
+	DB.AutoMigrate(&models.Channel{})
 }

@@ -5,6 +5,7 @@ import (
 	"go-authentication/src/database"
 	"go-authentication/src/models"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/websocket"
 )
@@ -15,24 +16,26 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-var channels = make(map[string]map[*websocket.Conn]bool)
+var channels = make(map[uint64]map[*websocket.Conn]bool)
 var clients = make(map[*websocket.Conn]bool)
 var broadcast = make(chan Message)
 
 type Message struct {
-	Channel    string `json:"channel"`
+	ChannelID  uint   `json:"channelid"`
 	SenderID   uint   `json:"senderid"`
 	ReceiverID uint   `json:"receiverid"`
 	Content    string `json:"content"`
 }
 
 type MessageRequestBody struct {
-	Channel string `json:"channel"`
+	ChannelID uint `json:"channelid"`
 }
 
 func HandleConnections(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
-	channel := query.Get("channel")
+	channelIDStr := query.Get("channelid")
+
+	channelID, err := strconv.ParseUint(channelIDStr, 10, 64)
 
 	ws, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -41,26 +44,26 @@ func HandleConnections(w http.ResponseWriter, r *http.Request) {
 	}
 	defer ws.Close()
 
-	if channels[channel] == nil {
-		channels[channel] = make(map[*websocket.Conn]bool)
+	if channels[channelID] == nil {
+		channels[channelID] = make(map[*websocket.Conn]bool)
 	}
-	channels[channel][ws] = true
+	channels[channelID][ws] = true
 
 	for {
 		var msg Message
 		err := ws.ReadJSON(&msg)
 		if err != nil {
-			delete(channels[channel], ws)
+			delete(channels[channelID], ws)
 			break
 		}
 
 		database.DB.Create(&msg)
 
-		for client := range channels[channel] {
+		for client := range channels[channelID] {
 			err := client.WriteJSON(msg)
 			if err != nil {
 				client.Close()
-				delete(channels[channel], client)
+				delete(channels[channelID], client)
 			}
 		}
 	}
@@ -70,13 +73,15 @@ func HandleMessages() {
 	for {
 		msg := <-broadcast
 
-		channel := msg.Channel
+		channel := msg.ChannelID
 
-		for client := range channels[channel] {
+		channelID64 := uint64(channel)
+
+		for client := range channels[channelID64] {
 			err := client.WriteJSON(msg)
 			if err != nil {
 				client.Close()
-				delete(channels[channel], client)
+				delete(channels[channelID64], client)
 			}
 		}
 	}
@@ -93,6 +98,6 @@ func GetMessages(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var messages []models.Message
-	database.DB.Where("channel = ?", messageRequestBody.Channel).Find(&messages)
+	database.DB.Where("channel_id = ?", messageRequestBody.ChannelID).Find(&messages)
 	json.NewEncoder(w).Encode(messages)
 }

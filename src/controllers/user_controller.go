@@ -79,3 +79,22 @@ func UpdateUserInfo(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to encode user info", http.StatusInternalServerError)
 	}
 }
+
+func GetAllUsers(w http.ResponseWriter, r *http.Request) {
+	var users []models.User
+
+	if err := database.DB.Find(&users).Error; err != nil {
+		http.Error(w, "Failed to fetch users", http.StatusInternalServerError)
+		return
+	}
+
+	for i := range users {
+		users[i].Password = ""
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(users); err != nil {
+		http.Error(w, "Failed to encode users", http.StatusInternalServerError)
+	}
+}

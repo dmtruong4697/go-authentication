@@ -17,7 +17,7 @@ func SetupRouter() *mux.Router {
 	// Swagger route
 	r.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
 
-	// Unprotected routes
+	// auth routes
 	r.HandleFunc("/register", controllers.Register).Methods("POST")
 	r.HandleFunc("/login", controllers.Login).Methods("POST")
 
@@ -30,11 +30,18 @@ func SetupRouter() *mux.Router {
 		w.Write([]byte("Hello, " + email))
 	}).Methods("GET")
 
+	// user route
 	api.HandleFunc("/get-user-info", controllers.GetUserInfo).Methods("GET")
 	api.HandleFunc("/update-user-info", controllers.UpdateUserInfo).Methods("PUT")
+	api.HandleFunc("/all-user", controllers.GetAllUsers).Methods("POST")
 
+	// chat route
 	r.HandleFunc("/ws", controllers.HandleConnections).Methods("GET")
 	r.HandleFunc("/messages", controllers.GetMessages).Methods("POST")
+
+	// channel route
+	api.HandleFunc("/channels", controllers.GetChannelsByUser).Methods("POST")
+	api.HandleFunc("/create-channels", controllers.CreateChannel).Methods("POST")
 
 	return r
 }

@@ -1,9 +1,11 @@
 package models
 
+import "time"
+
 type Message struct {
-	ID         uint   `json:"id" gorm:"primaryKey"`
-	Channel    string `json:"channel"`
-	SenderID   uint   `json:"senderid"`
-	ReceiverID uint   `json:"receiverid"`
-	Content    string `json:"content"`
+	ID        uint      `json:"id" gorm:"primaryKey"`
+	ChannelID uint      `json:"channelid"`
+	SenderID  uint      `json:"senderid"`
+	Content   string    `json:"content"`
+	CreateAt  time.Time `json:"createat"`
 }

@@ -13,6 +13,8 @@ import (
 var JwtKey = []byte("my_secret_key")
 
 type Claims struct {
+	ID    uint   `json:"id"`
+	Name  string `json:"name"`
 	Email string `json:"email"`
 	jwt.StandardClaims
 }
@@ -61,7 +63,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 // @Failure 401 {string} string "Unauthorized"
 // @Router /login [post]
 func Login(w http.ResponseWriter, r *http.Request) {
-	var user models.User
+	var user LoginUser
 	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -81,7 +83,9 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	// Tạo JWT token
 	expirationTime := time.Now().Add(24 * time.Hour)
 	claims := &Claims{
-		Email: user.Email,
+		ID:    dbUser.ID,
+		Name:  dbUser.Name,
+		Email: dbUser.Email,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(),
 		},
@@ -100,6 +104,20 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		Expires: expirationTime,
 	})
 
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]string{"token": tokenString})
+	jsonUser, err := json.Marshal(dbUser)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	responseData := map[string]interface{}{
+		"token": tokenString,
+		"user":  string(jsonUser),
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(responseData); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
